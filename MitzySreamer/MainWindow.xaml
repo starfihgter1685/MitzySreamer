@@ -1,53 +1,74 @@
 ﻿<Window x:Class="MitzyStreamer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MitzyStreamer" Height="600" Width="900">
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        Title="MitzyStreamer" Height="600" Width="800">
+    <DockPanel LastChildFill="True">
 
-        <!-- Login-Bereich oben -->
-        <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
-            <Grid Margin="5">
-                <TextBox x:Name="ServerBox" Width="200"/>
-                <Label x:Name="ServerBoxPlaceholder" Content="Server URL" Background="Transparent"
-                       Opacity="0.5" IsHitTestVisible="False" VerticalAlignment="Top" Margin="5,2,0,0"/>
+        <!-- Statusleiste ganz unten -->
+        <StatusBar DockPanel.Dock="Bottom" Name="MainStatusBar">
+            <TextBlock Name="NowPlayingText" Text="Kein Song" Margin="5"/>
+            <Separator/>
+            <TextBlock Name="ElapsedText" Text="00:00" Margin="5"/>
+            <ProgressBar Name="SongProgress" Width="200" Height="16" Minimum="0" Maximum="1" Margin="5"/>
+            <TextBlock Name="DurationText" Text="00:00" Margin="5"/>
+        </StatusBar>
+
+
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Login Bereich -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10" VerticalAlignment="Top">
+                <StackPanel Margin="5">
+                    <TextBlock Text="Server URL"/>
+                    <TextBox x:Name="ServerBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Margin="5">
+                    <TextBlock Text="Benutzername"/>
+                    <TextBox x:Name="UserBox" Width="150"/>
+                </StackPanel>
+                <StackPanel Margin="5">
+                    <TextBlock Text="Passwort"/>
+                    <PasswordBox x:Name="PassBox" Width="150"/>
+                </StackPanel>
+                <Button Content="Login" Click="Login_Click" Margin="5" VerticalAlignment="Bottom"/>
+            </StackPanel>
+
+            <!-- Hauptinhalt -->
+            <Grid Grid.Row="1" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+
+                <ListBox x:Name="ArtistList" SelectionChanged="ArtistList_SelectionChanged" Margin="5"/>
+                <ListBox x:Name="AlbumList" Grid.Column="1" SelectionChanged="AlbumList_SelectionChanged" Margin="5"/>
+                <ListBox x:Name="TrackList" Grid.Column="2" SelectionChanged="TrackList_SelectionChanged" Margin="5"/>
             </Grid>
 
-            <Grid Margin="5">
-                <TextBox x:Name="UserBox" Width="150"/>
-                <Label x:Name="UserBoxPlaceholder" Content="Benutzername" Background="Transparent"
-                       Opacity="0.5" IsHitTestVisible="False" VerticalAlignment="Top" Margin="5,2,0,0"/>
-            </Grid>
-
-            <PasswordBox x:Name="PassBox" Width="150" Margin="5"/>
-            <Button Content="Verbinden" Width="100" Click="Login_Click" Margin="5"/>
-        </StackPanel>
-
-        <!-- Listen-UI unten -->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="3*"/>
-            </Grid.ColumnDefinitions>
-
-            <StackPanel Grid.Column="0" Margin="5">
-                <Label Content="Künstler" FontWeight="Bold"/>
-                <ListBox x:Name="ArtistList" SelectionChanged="ArtistList_SelectionChanged"/>
+            <!-- Steuerung -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="⏮️" Click="PrevTrack_Click" Margin="5"/>
+                <Button Content="▶️ / ⏸️" Click="PlayPause_Click" Margin="5"/>
+                <Button Content="⏭️" Click="NextTrack_Click" Margin="5"/>
             </StackPanel>
 
-            <StackPanel Grid.Column="1" Margin="5">
-                <Label Content="Alben" FontWeight="Bold"/>
-                <ListBox x:Name="AlbumList" SelectionChanged="AlbumList_SelectionChanged"/>
-            </StackPanel>
-
-            <StackPanel Grid.Column="2" Margin="5">
-                <Label Content="Tracks" FontWeight="Bold"/>
-                <ListBox x:Name="TrackList" SelectionChanged="TrackList_SelectionChanged"/>
-            </StackPanel>
+            <!-- Playlists -->
+            <ListBox x:Name="PlaylistList"
+                     Grid.Row="1"
+                     Grid.ColumnSpan="3"
+                     VerticalAlignment="Bottom"
+                     Height="100"
+                     SelectionChanged="PlaylistList_SelectionChanged"
+                     Margin="5"
+                     Background="LightGray"
+                     BorderBrush="Black"
+                     BorderThickness="1"/>
         </Grid>
-    </Grid>
+    </DockPanel>
 </Window>
