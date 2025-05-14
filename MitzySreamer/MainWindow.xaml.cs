@@ -23,6 +23,8 @@ namespace MitzyStreamer
         private TimeSpan currentSongDuration = TimeSpan.Zero;
         private DateTime songStartTime;
         private string currentSongName = "";
+        private bool isShuffleEnabled = false;
+        private bool isManualSelection = false;
 
 
         private readonly string SettingsFilePath = Path.Combine(
@@ -76,6 +78,11 @@ namespace MitzyStreamer
             {
                 MessageBox.Show("💥 Fehler: " + ex.Message);
             }
+        }
+        private void ShuffleButton_Click(object sender, RoutedEventArgs e)
+        {
+            isShuffleEnabled = !isShuffleEnabled;
+            ShuffleButton.Content = isShuffleEnabled ? "Shuffle: Ein" : "Shuffle: Aus";
         }
 
         private async System.Threading.Tasks.Task LoadArtists()
@@ -189,11 +196,51 @@ namespace MitzyStreamer
 
         private void TrackList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (TrackList.SelectedItem is ListBoxItem selected)
+            if (TrackList.SelectedItem is ListBoxItem selectedItem)
             {
-                currentTrackIndex = TrackList.SelectedIndex;
-                PlayTrackByIndex(currentTrackIndex);
+                // Eventhandler temporär entfernen
+                TrackList.SelectionChanged -= TrackList_SelectionChanged;
+
+                int index = TrackList.Items.IndexOf(selectedItem);
+                isManualSelection = true;
+                PlayTrackByIndex(index);
+                isManualSelection = false;
+
+                if (isShuffleEnabled)
+                {
+                    ShuffleTrackListPreserveCurrent();
+                }
+
+                // Eventhandler wieder hinzufügen
+                TrackList.SelectionChanged += TrackList_SelectionChanged;
             }
+        }
+        private void ShuffleTrackListPreserveCurrent()
+        {
+            if (TrackList.SelectedIndex < 0) return;
+
+            var currentItem = TrackList.SelectedItem;
+            var items = TrackList.Items.Cast<ListBoxItem>().ToList();
+            var rng = new Random();
+
+            // Entferne das aktuell gespielte Lied
+            items.Remove((ListBoxItem)currentItem);
+
+            // Shuffle den Rest
+            items = items.OrderBy(x => rng.Next()).ToList();
+
+            // Aktuelles Lied wieder vorne einfügen
+            items.Insert(0, (ListBoxItem)currentItem);
+
+            // Liste updaten
+            TrackList.Items.Clear();
+            foreach (var item in items)
+            {
+                TrackList.Items.Add(item);
+            }
+
+            // Wieder auf das aktuelle setzen
+            TrackList.SelectedIndex = 0;
         }
 
         private void PlayPause_Click(object sender, RoutedEventArgs e)
